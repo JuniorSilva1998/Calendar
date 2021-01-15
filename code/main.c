@@ -36,7 +36,6 @@ struct todayDate todayDate;
 
 struct Local {
     int region;
-    char name[4];
 };
 struct Local local;
 
@@ -77,7 +76,7 @@ int main(int arg, char *argv[]) {
 			SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 			SDL_RenderClear(renderer);
 
-            font = TTF_OpenFont("Sample.ttf", 32);
+            font = TTF_OpenFont("Sample.ttf", 48);
 			if (!font) {
 				printf("Failed to load Sample font! SDL_ttf Error: %s\n", TTF_GetError());
 			}
@@ -97,6 +96,8 @@ int main(int arg, char *argv[]) {
             SDL_Delay((1.F / 60) * 1000);
 
             int region = local.region;
+            int year = date.year;
+            int month = date.month;
 
             /* Handle events on queue */
 			SDL_Event e;
@@ -117,16 +118,18 @@ int main(int arg, char *argv[]) {
 						case SDLK_RIGHT:
 							nextMonth();
 							break;
-                        /*
                         case SDLK_e:
                             region++;
 							setLocal(region);
+                            date.year = year;
+                            date.month = month;
 							break;
 						case SDLK_q:
                             region--;
 							setLocal(region);
+                            date.year = year;
+                            date.month = month;
 							break;
-                        */
                         case SDLK_RETURN:
                             setDateToTodayDate();
                             break;
@@ -212,15 +215,6 @@ void setLocal(int region) {
         region = 0;
     }
     local.region = region;
-    char name[4];
-    if (region == 1) {
-        strcat(name, "USA");
-    } else if (region == 2) {
-        strcat(name, "EUR");
-    } else {
-        strcat(name, "INT");
-    }
-    strcat(local.name, name);
 }
 
 int isLeapYear(int year) {
@@ -388,21 +382,29 @@ void renderDayOfWeek(SDL_Surface* textSurface, SDL_Color color) {
 
     int dayOfWeek;
     for (dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
-        if (dayOfWeek == 0) {
+        if ((dayOfWeek == 0 && local.region != 2) || (dayOfWeek == 6 && local.region == 2)) {
 			SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
 			SDL_Color color = {0xFF, 0x00, 0x00};
             SDL_RenderDrawRect(renderer, &recDayOfWeek);
-            textSurface = TTF_RenderText_Solid(font, getDayName(dayOfWeek), color);
+            if (local.region != 2) {
+                textSurface = TTF_RenderText_Solid(font, getDayName(dayOfWeek), color);
+            } else {
+                textSurface = TTF_RenderText_Solid(font, getDayName(dayOfWeek - 6), color);
+            }
 		    SDL_Texture* dayName = SDL_CreateTextureFromSurface(renderer, textSurface);
 		    SDL_RenderCopy(renderer, dayName, NULL, &recDayOfWeekText);
 		    SDL_DestroyTexture(dayName);
 		    SDL_FreeSurface(textSurface);
 		    textSurface = NULL;
-        } else if (dayOfWeek == 6) {
+        } else if ((dayOfWeek == 6 && local.region != 2) || (dayOfWeek == 5 && local.region == 2)) {
 			SDL_SetRenderDrawColor(renderer, 0x00, 0xFF, 0xFF, 0xFF);
 			SDL_Color color = {0x00, 0xFF, 0xFF};
             SDL_RenderDrawRect(renderer, &recDayOfWeek);
-            textSurface = TTF_RenderText_Solid(font, getDayName(dayOfWeek), color);
+            if (local.region != 2) {
+                textSurface = TTF_RenderText_Solid(font, getDayName(dayOfWeek), color);
+            } else {
+                textSurface = TTF_RenderText_Solid(font, getDayName(dayOfWeek + 1), color);
+            }
 		    SDL_Texture* dayName = SDL_CreateTextureFromSurface(renderer, textSurface);
 		    SDL_RenderCopy(renderer, dayName, NULL, &recDayOfWeekText);
 		    SDL_DestroyTexture(dayName);
@@ -412,7 +414,11 @@ void renderDayOfWeek(SDL_Surface* textSurface, SDL_Color color) {
             SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
             SDL_Color color = {0xFF, 0xFF, 0xFF};
             SDL_RenderDrawRect(renderer, &recDayOfWeek);
-            textSurface = TTF_RenderText_Solid(font, getDayName(dayOfWeek), color);
+            if (local.region != 2) {
+                textSurface = TTF_RenderText_Solid(font, getDayName(dayOfWeek), color);
+            } else {
+                textSurface = TTF_RenderText_Solid(font, getDayName(dayOfWeek + 1), color);
+            }
 		    SDL_Texture* dayName = SDL_CreateTextureFromSurface(renderer, textSurface);
 		    SDL_RenderCopy(renderer, dayName, NULL, &recDayOfWeekText);
 		    SDL_DestroyTexture(dayName);
@@ -482,8 +488,18 @@ void renderDate() {
     char dayStr[2];
     int dayOfWeek = getDayNumber(date.year, date.month, 1);
 
-    recDayOfMonth.x += ((SCREEN_WIDTH - 80) / 7) * dayOfWeek;
-    recDayOfMonthText.x += ((SCREEN_WIDTH - 80) / 7) * dayOfWeek;
+    if (local.region != 2) {
+        recDayOfMonth.x += ((SCREEN_WIDTH - 80) / 7) * dayOfWeek;
+        recDayOfMonthText.x += ((SCREEN_WIDTH - 80) / 7) * dayOfWeek;
+    } else {
+        if (dayOfWeek != 0) {
+            recDayOfMonth.x += ((SCREEN_WIDTH - 80) / 7) * (dayOfWeek - 1);
+            recDayOfMonthText.x += ((SCREEN_WIDTH - 80) / 7) * (dayOfWeek - 1);
+        } else {
+            recDayOfMonth.x += ((SCREEN_WIDTH - 80) / 7) * (dayOfWeek + 6);
+            recDayOfMonthText.x += ((SCREEN_WIDTH - 80) / 7) * (dayOfWeek + 6);
+        }
+    }
 	for (day = 0; day < daysInMonth; day++) {
 		itoa(day + 1, dayStr, 10);
 		if (date.year == todayDate.year && date.month == todayDate.month && day == todayDate.day - 1) {
@@ -532,19 +548,37 @@ void renderDate() {
             recDayOfMonthText.x -= 25;
             recDayOfMonthText.w *= 2;
         }
-        if (dayOfWeek == 6) {
-			dayOfWeek = 0;
-			recDayOfMonth.x = 40;
-            if (day < 8) {
-                recDayOfMonthText.x = 70;
-            } else {
-                recDayOfMonthText.x = 45;
-            }
-			recDayOfMonth.y += (SCREEN_HEIGHT - 80) / 8;
-            recDayOfMonthText.y += (SCREEN_HEIGHT - 80) / 8;
-		} else {
-			dayOfWeek++;
-		}
+        if (local.region != 2) {
+            if (dayOfWeek == 6) {
+			    dayOfWeek = 0;
+			    recDayOfMonth.x = 40;
+                if (day < 8) {
+                    recDayOfMonthText.x = 70;
+                } else {
+                    recDayOfMonthText.x = 45;
+                }
+			    recDayOfMonth.y += (SCREEN_HEIGHT - 80) / 8;
+                recDayOfMonthText.y += (SCREEN_HEIGHT - 80) / 8;
+		    } else {
+			    dayOfWeek++;
+		    }
+        } else {
+            if (dayOfWeek == 6) {
+			    dayOfWeek = 0;
+            } else if (dayOfWeek == 0) {
+			    recDayOfMonth.x = 40;
+                if (day < 8) {
+                    recDayOfMonthText.x = 70;
+                } else {
+                    recDayOfMonthText.x = 45;
+                }
+			    recDayOfMonth.y += (SCREEN_HEIGHT - 80) / 8;
+                recDayOfMonthText.y += (SCREEN_HEIGHT - 80) / 8;
+                dayOfWeek++;
+		    } else {
+			    dayOfWeek++;
+		    }
+        }
 	}
 }
 
@@ -561,10 +595,27 @@ void renderTime(SDL_Surface* textSurface, SDL_Color color) {
     recTime.w = (SCREEN_WIDTH - 80) / 5;
     recTime.h = (SCREEN_HEIGHT - 80) / 16;
 
+    SDL_Rect recLocale;
+    recLocale.x = (SCREEN_WIDTH - 80) / 2 + 40;
+    recLocale.y = SCREEN_HEIGHT - 80;
+    recLocale.w = (SCREEN_WIDTH - 80) / 2;
+    recLocale.h = (SCREEN_HEIGHT - 80) / 16;
+
     int locale = local.region; /* International = 0, North America = 1, Europe = 2 */
 
-    char date[40] = "";
-    char time[40] = "";
+    char date[25] = "";
+    char time[25] = "";
+    char localeText[25] = "Locale is set to: ";
+
+    char name[4];
+    if (local.region == 1) {
+        strcat(name, "USA");
+    } else if (local.region == 2) {
+        strcat(name, "EUR");
+    } else {
+        strcat(name, "INT");
+    }
+    strcat(localeText, name);
 
     char yearStr[5];
     char monthStr[2];
@@ -677,6 +728,13 @@ void renderTime(SDL_Surface* textSurface, SDL_Color color) {
 	SDL_Texture* displayTime = SDL_CreateTextureFromSurface(renderer, textSurface);
 	SDL_RenderCopy(renderer, displayTime, NULL, &recTime);
 	SDL_DestroyTexture(displayTime);
+	SDL_FreeSurface(textSurface);
+	textSurface = NULL;
+
+    textSurface = TTF_RenderText_Solid(font, localeText, color);
+	SDL_Texture* displayLocale = SDL_CreateTextureFromSurface(renderer, textSurface);
+	SDL_RenderCopy(renderer, displayLocale, NULL, &recLocale);
+	SDL_DestroyTexture(displayLocale);
 	SDL_FreeSurface(textSurface);
 	textSurface = NULL;
 }
