@@ -21,4 +21,6 @@ ENTER Key jumps to the current month and year.
 
 Locale is set to North America as default. This can be changed to Europe, and International.
 
+This program uses the Gregorian calendar, but if you set the date to anywhere before October 1582, the Julian calendar will be used instead. If viewed on October 1582, the first four days are based on the Julian calendar, but after that will use the Gregorian dates, starting on October 15, 1582. October 15, 1582 (Friday) is positioned the day after October 4, 1582 (Thursday).
+
 SDL2 may need to be installed and set as dependencies for this to work.
