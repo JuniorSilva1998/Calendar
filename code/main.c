@@ -305,9 +305,16 @@ int getDayNumber(int year, int month, int day) {
             d = 99;
         }
     }
-    f = (k + ((13 * m - 1) / 5) + d + (d / 4) + (c / 4) - (2 * c)) % 7;
+    if (year > 1582 || (year == 1582 && (month > 10 || (month == 10 && day > 4)))) {
+        f = (k + ((13 * m - 1) / 5) + d + (d / 4) + (c / 4) - (2 * c)) % 7;
+    } else {
+        f = (k + ((13 * m - 1) / 5) + d + (d / 4) + 5 - c) % 7;
+    }
     if (f < 0) {
         f += 7;
+        if (f < 0 && year > 1582) {
+            f += 7;
+    }
     }
     return f;
 }
@@ -501,6 +508,9 @@ void renderDate() {
         }
     }
 	for (day = 0; day < daysInMonth; day++) {
+        if (date.year == 1582 && date.month == 10 && day > 3 && day < 14) {
+            continue;
+        }
 		itoa(day + 1, dayStr, 10);
 		if (date.year == todayDate.year && date.month == todayDate.month && day == todayDate.day - 1) {
             SDL_SetRenderDrawColor(renderer, 0x00, 0xFF, 0x00, 0xFF);
@@ -544,7 +554,7 @@ void renderDate() {
 		}
 		recDayOfMonth.x += (SCREEN_WIDTH - 80) / 7;
         recDayOfMonthText.x += (SCREEN_WIDTH - 80) / 7;
-        if (day == 8) {
+        if (day == 8 || (date.year == 1582 && date.month == 10 && day == 3)) {
             recDayOfMonthText.x -= 25;
             recDayOfMonthText.w *= 2;
         }
