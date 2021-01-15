@@ -14,3 +14,5 @@ DOWN Key jumps to the previous year.
 
 
 Locale is set to North America, so the calender displays Sunday as the first day of the week, date display is in MDY, and time is displayed as a 12 hour clock.
+
+SDL2 may need to be installed and set as dependencies for this to work.
