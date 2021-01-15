@@ -312,9 +312,6 @@ int getDayNumber(int year, int month, int day) {
     }
     if (f < 0) {
         f += 7;
-        if (f < 0 && year > 1582) {
-            f += 7;
-    }
     }
     return f;
 }
