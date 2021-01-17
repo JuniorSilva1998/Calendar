@@ -68,6 +68,10 @@ int main(int arg, char *argv[]) {
 		printf("Failed to initialize!\n");
         return -1;
 	} else {
+        font = TTF_OpenFont("Arial.ttf", 48);
+		if (!font) {
+			printf("Failed to load Arial font! SDL_ttf Error: %s\n", TTF_GetError());
+		}
         setLocal(1);
         getTodayDate();
         setDateToTodayDate();
@@ -75,12 +79,6 @@ int main(int arg, char *argv[]) {
         while (!quit) {
 			SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 			SDL_RenderClear(renderer);
-
-            font = TTF_OpenFont("Arial.ttf", 48);
-			if (!font) {
-				printf("Failed to load Arial font! SDL_ttf Error: %s\n", TTF_GetError());
-			}
-
             SDL_Surface* textSurface;
             SDL_Color color = {0xFF, 0xFF, 0xFF};
 
