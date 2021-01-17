@@ -76,9 +76,9 @@ int main(int arg, char *argv[]) {
 			SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 			SDL_RenderClear(renderer);
 
-            font = TTF_OpenFont("Sample.ttf", 48);
+            font = TTF_OpenFont("Arial.ttf", 48);
 			if (!font) {
-				printf("Failed to load Sample font! SDL_ttf Error: %s\n", TTF_GetError());
+				printf("Failed to load Arial font! SDL_ttf Error: %s\n", TTF_GetError());
 			}
 
             SDL_Surface* textSurface;
