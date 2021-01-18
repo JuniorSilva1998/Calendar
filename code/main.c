@@ -172,8 +172,7 @@ int init() {
 	}
 }
 
-void close()
-{
+void close() {
 	/* Free global font */
 	TTF_CloseFont(font);
 	font = NULL;
