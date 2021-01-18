@@ -14,10 +14,10 @@
 				"-IC:\\Program Files\\mingw-w64\\x86_64-8.1.0-posix-seh-rt_v6-rev0\\mingw64\\x86_64-w64-mingw32\\include",
 				"-LC:\\Program Files\\mingw-w64\\x86_64-8.1.0-posix-seh-rt_v6-rev0\\mingw64\\x86_64-w64-mingw32\\lib",
 				"-lmingw32",
-                "-lSDL2main",
+                		"-lSDL2main",
 				"-lSDL2",
 				"-lSDL2_ttf",
-                "-mwindows"
+                		"-mwindows"
 			],
 			"options": {
 				"cwd": "C:\\Program Files\\mingw-w64\\x86_64-8.1.0-posix-seh-rt_v6-rev0\\mingw64\\bin"
